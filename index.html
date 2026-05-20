@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RDA Reference</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f7fa;
+    padding: 16px;
+    color: #1a1a1a;
+    line-height: 1.4;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 24px; text-align: center; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 13px; color: #666; margin-bottom: 20px; }
+
+  .selector {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .selector-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  .btn-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .btn-group:last-child { margin-bottom: 0; }
+  .btn {
+    padding: 8px 14px;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    color: #1a1a1a;
+  }
+  .btn:hover { border-color: #999; }
+  .btn.active { background: #1a1a1a; color: white; border-color: #1a1a1a; }
+  .btn.sex-male.active { background: #1E88E5; border-color: #1E88E5; }
+  .btn.sex-female.active { background: #E91E63; border-color: #E91E63; }
+
+  .current {
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 16px;
+    padding: 10px;
+    background: #eef2f7;
+    border-radius: 8px;
+  }
+  .current strong { color: #1a1a1a; }
+
+  .section {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    background: white;
+  }
+  .section-header {
+    padding: 12px 16px;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .h-energy   { background: linear-gradient(135deg, #42A5F5, #1E88E5); }
+  .h-macros   { background: linear-gradient(135deg, #FF6B6B, #EE5A6F); }
+  .h-vitamins { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+  .h-major    { background: linear-gradient(135deg, #FFA726, #FB8C00); }
+  .h-trace    { background: linear-gradient(135deg, #AB47BC, #8E24AA); }
+
+  table { width: 100%; border-collapse: collapse; }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+  }
+  td:first-child { font-weight: 500; }
+  td:last-child {
+    text-align: right;
+    color: #333;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: #fafafa; }
+
+  .note {
+    background: #FFF9C4;
+    border-left: 4px solid #FBC02D;
+    padding: 12px 14px;
+    margin-top: 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #5d4e00;
+  }
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #888;
+    margin-top: 20px;
+    padding-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h1>🥗 Daily Nutrition Reference</h1>
+<p class="subtitle">RDA / DRI values by age &amp; sex · Source: NIH / National Academies</p>
+
+<div class="selector">
+  <div class="selector-label">Sex</div>
+  <div class="btn-group" id="sex-group">
+    <button class="btn sex-male active" data-sex="male">♂ Male</button>
+    <button class="btn sex-female" data-sex="female">♀ Female</button>
+  </div>
+  <div class="selector-label">Age Group</div>
+  <div class="btn-group" id="age-group">
+    <button class="btn" data-age="1-3">1–3</button>
+    <button class="btn" data-age="4-8">4–8</button>
+    <button class="btn" data-age="9-13">9–13</button>
+    <button class="btn" data-age="14-18">14–18</button>
+    <button class="btn active" data-age="19-30">19–30</button>
+    <button class="btn" data-age="31-50">31–50</button>
+    <button class="btn" data-age="51-70">51–70</button>
+    <button class="btn" data-age="71+">71+</button>
+  </div>
+  <div class="selector-label" id="extra-label" style="display:none;">Special</div>
+  <div class="btn-group" id="extra-group" style="display:none;"></div>
+</div>
+
+<div class="current" id="current">Showing: <strong>Male, 19–30 years</strong></div>
+
+<div id="tables"></div>
+
+<div class="note">
+  <strong>Legend:</strong> Values shown are RDA (Recommended Dietary Allowance) or AI (Adequate Intake) where RDA isn't established. "—" means not separately established. Calorie needs assume moderate activity; adjust ±300 kcal for sedentary or very active.
+</div>
+
+<div class="footer">Data: NIH Office of Dietary Supplements DRI tables · For reference only, not medical advice</div>
+
+<script>
+// =================== DRI DATA ===================
+// Structure: data[group] = { calories, water, carbs, protein, fat, fiber, vitA, ... }
+// Group keys: "M-1-3", "F-1-3", "M-19-30", "F-19-30-preg", etc.
+// Up to age 8, M and F share values but we duplicate for simplicity.
+
+const DATA = {
+  // CHILDREN (same for M/F)
+  "1-3":   { cal:1000, water:1.3, carb:130, prot:13,  fat:"30-40%", fib:19, vitA:300, vitC:15, vitD:15, vitE:6,  vitK:30,  b1:0.5, b2:0.5, b3:6,  b5:2, b6:0.5, b7:8,  b9:150, b12:0.9, choline:200, ca:700,  p:460, mg:80,  k:2000, na:1200, cl:1500, fe:7,  zn:3,  cu:340, mn:1.2, i:90,  se:20, cr:11, mo:17, fl:0.7 },
+  "4-8":   { cal:1400, water:1.7, carb:130, prot:19,  fat:"25-35%", fib:25, vitA:400, vitC:25, vitD:15, vitE:7,  vitK:55,  b1:0.6, b2:0.6, b3:8,  b5:3, b6:0.6, b7:12, b9:200, b12:1.2, choline:250, ca:1000, p:500, mg:130, k:2300, na:1500, cl:1900, fe:10, zn:5,  cu:440, mn:1.5, i:90,  se:30, cr:15, mo:22, fl:1   },
+
+  // MALES
+  "M-9-13":   { cal:1800, water:2.4, carb:130, prot:34,  fat:"25-35%", fib:31, vitA:600, vitC:45, vitD:15, vitE:11, vitK:60,  b1:0.9, b2:0.9, b3:12, b5:4, b6:1.0, b7:20, b9:300, b12:1.8, choline:375, ca:1300, p:1250,mg:240, k:2500, na:1800, cl:2300, fe:8,  zn:8,  cu:700, mn:1.9, i:120, se:40, cr:25, mo:34, fl:2   },
+  "M-14-18":  { cal:2800, water:3.3, carb:130, prot:52,  fat:"25-35%", fib:38, vitA:900, vitC:75, vitD:15, vitE:15, vitK:75,  b1:1.2, b2:1.3, b3:16, b5:5, b6:1.3, b7:25, b9:400, b12:2.4, choline:550, ca:1300, p:1250,mg:410, k:3000, na:2300, cl:2300, fe:11, zn:11, cu:890, mn:2.2, i:150, se:55, cr:35, mo:43, fl:3   },
+  "M-19-30":  { cal:2600, water:3.7, carb:130, prot:56,  fat:"20-35%", fib:38, vitA:900, vitC:90, vitD:15, vitE:15, vitK:120, b1:1.2, b2:1.3, b3:16, b5:5, b6:1.3, b7:30, b9:400, b12:2.4, choline:550, ca:1000, p:700, mg:400, k:3400, na:1500, cl:2300, fe:8,  zn:11, cu:900, mn:2.3, i:150, se:55, cr:35, mo:45, fl:4   },
+  "M-31-50":  { cal:2400, water:3.7, carb:130, prot:56,  fat:"20-35%", fib:38, vitA:900, vitC:90, vitD:15, vitE:15, vitK:120, b1:1.2, b2:1.3, b3:16, b5:5, b6:1.3, b7:30, b9:400, b12:2.4, choline:550, ca:1000, p:700, mg:420, k:3400, na:1500, cl:2300, fe:8,  zn:11, cu:900, mn:2.3, i:150, se:55, cr:35, mo:45, fl:4   },
+  "M-51-70":  { cal:2200, water:3.7, carb:130, prot:56,  fat:"20-35%", fib:30, vitA:900, vitC:90, vitD:15, vitE:15, vitK:120, b1:1.2, b2:1.3, b3:16, b5:5, b6:1.7, b7:30, b9:400, b12:2.4, choline:550, ca:1000, p:700, mg:420, k:3400, na:1500, cl:2000, fe:8,  zn:11, cu:900, mn:2.3, i:150, se:55, cr:30, mo:45, fl:4   },
+  "M-71+":    { cal:2000, water:3.7, carb:130, prot:56,  fat:"20-35%", fib:30, vitA:900, vitC:90, vitD:20, vitE:15, vitK:120, b1:1.2, b2:1.3, b3:16, b5:5, b6:1.7, b7:30, b9:400, b12:2.4, choline:550, ca:1200, p:700, mg:420, k:3400, na:1500, cl:1800, fe:8,  zn:11, cu:900, mn:2.3, i:150, se:55, cr:30, mo:45, fl:4   },
+
+  // FEMALES
+  "F-9-13":   { cal:1600, water:2.1, carb:130, prot:34,  fat:"25-35%", fib:26, vitA:600, vitC:45, vitD:15, vitE:11, vitK:60,  b1:0.9, b2:0.9, b3:12, b5:4, b6:1.0, b7:20, b9:300, b12:1.8, choline:375, ca:1300, p:1250,mg:240, k:2300, na:1800, cl:2300, fe:8,  zn:8,  cu:700, mn:1.6, i:120, se:40, cr:21, mo:34, fl:2   },
+  "F-14-18":  { cal:2000, water:2.3, carb:130, prot:46,  fat:"25-35%", fib:26, vitA:700, vitC:65, vitD:15, vitE:15, vitK:75,  b1:1.0, b2:1.0, b3:14, b5:5, b6:1.2, b7:25, b9:400, b12:2.4, choline:400, ca:1300, p:1250,mg:360, k:2300, na:2300, cl:2300, fe:15, zn:9,  cu:890, mn:1.6, i:150, se:55, cr:24, mo:43, fl:3   },
+  "F-19-30":  { cal:2000, water:2.7, carb:130, prot:46,  fat:"20-35%", fib:25, vitA:700, vitC:75, vitD:15, vitE:15, vitK:90,  b1:1.1, b2:1.1, b3:14, b5:5, b6:1.3, b7:30, b9:400, b12:2.4, choline:425, ca:1000, p:700, mg:310, k:2600, na:1500, cl:2300, fe:18, zn:8,  cu:900, mn:1.8, i:150, se:55, cr:25, mo:45, fl:3   },
+  "F-31-50":  { cal:1800, water:2.7, carb:130, prot:46,  fat:"20-35%", fib:25, vitA:700, vitC:75, vitD:15, vitE:15, vitK:90,  b1:1.1, b2:1.1, b3:14, b5:5, b6:1.3, b7:30, b9:400, b12:2.4, choline:425, ca:1000, p:700, mg:320, k:2600, na:1500, cl:2300, fe:18, zn:8,  cu:900, mn:1.8, i:150, se:55, cr:25, mo:45, fl:3   },
+  "F-51-70":  { cal:1600, water:2.7, carb:130, prot:46,  fat:"20-35%", fib:21, vitA:700, vitC:75, vitD:15, vitE:15, vitK:90,  b1:1.1, b2:1.1, b3:14, b5:5, b6:1.5, b7:30, b9:400, b12:2.4, choline:425, ca:1200, p:700, mg:320, k:2600, na:1500, cl:2000, fe:8,  zn:8,  cu:900, mn:1.8, i:150, se:55, cr:20, mo:45, fl:3   },
+  "F-71+":    { cal:1600, water:2.7, carb:130, prot:46,  fat:"20-35%", fib:21, vitA:700, vitC:75, vitD:20, vitE:15, vitK:90,  b1:1.1, b2:1.1, b3:14, b5:5, b6:1.5, b7:30, b9:400, b12:2.4, choline:425, ca:1200, p:700, mg:320, k:2600, na:1500, cl:1800, fe:8,  zn:8,  cu:900, mn:1.8, i:150, se:55, cr:20, mo:45, fl:3   },
+
+  // PREGNANCY (using 19-30 as default reference)
+  "F-19-30-preg":  { cal:2400, water:3.0, carb:175, prot:71, fat:"20-35%", fib:28, vitA:770, vitC:85, vitD:15, vitE:15, vitK:90,  b1:1.4, b2:1.4, b3:18, b5:6, b6:1.9, b7:30, b9:600, b12:2.6, choline:450, ca:1000, p:700, mg:350, k:2900, na:1500, cl:2300, fe:27, zn:11, cu:1000, mn:2.0, i:220, se:60, cr:30, mo:50, fl:3 },
+  "F-19-30-lact":  { cal:2500, water:3.8, carb:210, prot:71, fat:"20-35%", fib:29, vitA:1300,vitC:120,vitD:15, vitE:19, vitK:90,  b1:1.4, b2:1.6, b3:17, b5:7, b6:2.0, b7:35, b9:500, b12:2.8, choline:550, ca:1000, p:700, mg:310, k:2800, na:1500, cl:2300, fe:9,  zn:12, cu:1300, mn:2.6, i:290, se:70, cr:45, mo:50, fl:3 },
+};
+
+// Field definitions with units and section grouping
+const FIELDS = [
+  { section:"energy",   title:"⚡ Energy & Hydration", color:"h-energy", rows:[
+    { key:"cal",   label:"Calories",      unit:"kcal" },
+    { key:"water", label:"Water (total)", unit:"L" },
+  ]},
+  { section:"macros",   title:"🍗 Macronutrients", color:"h-macros", rows:[
+    { key:"carb", label:"Carbohydrates (min)", unit:"g" },
+    { key:"prot", label:"Protein",             unit:"g" },
+    { key:"fat",  label:"Fat (% calories)",    unit:""  },
+    { key:"fib",  label:"Fiber",               unit:"g" },
+  ]},
+  { section:"vitamins", title:"💊 Vitamins", color:"h-vitamins", rows:[
+    { key:"vitA", label:"Vitamin A",          unit:"mcg RAE" },
+    { key:"vitC", label:"Vitamin C",          unit:"mg" },
+    { key:"vitD", label:"Vitamin D",          unit:"mcg" },
+    { key:"vitE", label:"Vitamin E",          unit:"mg" },
+    { key:"vitK", label:"Vitamin K",          unit:"mcg" },
+    { key:"b1",   label:"Thiamin (B1)",       unit:"mg" },
+    { key:"b2",   label:"Riboflavin (B2)",    unit:"mg" },
+    { key:"b3",   label:"Niacin (B3)",        unit:"mg" },
+    { key:"b5",   label:"Pantothenic acid",   unit:"mg" },
+    { key:"b6",   label:"Vitamin B6",         unit:"mg" },
+    { key:"b7",   label:"Biotin (B7)",        unit:"mcg" },
+    { key:"b9",   label:"Folate (B9)",        unit:"mcg DFE" },
+    { key:"b12",  label:"Vitamin B12",        unit:"mcg" },
+    { key:"choline", label:"Choline",         unit:"mg" },
+  ]},
+  { section:"major",    title:"🦴 Major Minerals", color:"h-major", rows:[
+    { key:"ca", label:"Calcium",       unit:"mg" },
+    { key:"p",  label:"Phosphorus",    unit:"mg" },
+    { key:"mg", label:"Magnesium",     unit:"mg" },
+    { key:"k",  label:"Potassium",     unit:"mg" },
+    { key:"na", label:"Sodium (AI)",   unit:"mg" },
+    { key:"cl", label:"Chloride",      unit:"mg" },
+  ]},
+  { section:"trace",    title:"⚙️ Trace Minerals", color:"h-trace", rows:[
+    { key:"fe", label:"Iron",       unit:"mg" },
+    { key:"zn", label:"Zinc",       unit:"mg" },
+    { key:"cu", label:"Copper",     unit:"mcg" },
+    { key:"mn", label:"Manganese",  unit:"mg" },
+    { key:"i",  label:"Iodine",     unit:"mcg" },
+    { key:"se", label:"Selenium",   unit:"mcg" },
+    { key:"cr", label:"Chromium",   unit:"mcg" },
+    { key:"mo", label:"Molybdenum", unit:"mcg" },
+    { key:"fl", label:"Fluoride",   unit:"mg" },
+  ]},
+];
+
+// =================== STATE + RENDER ===================
+let state = { sex:"male", age:"19-30", extra:null };
+
+function getKey() {
+  // Children 1-3 and 4-8 are sex-neutral
+  if (state.age === "1-3" || state.age === "4-8") return state.age;
+  if (state.extra) return `F-${state.age}-${state.extra}`;
+  const sexLetter = state.sex === "male" ? "M" : "F";
+  return `${sexLetter}-${state.age}`;
+}
+
+function ageLabel(a) {
+  return a === "71+" ? "71+ years" : `${a} years`;
+}
+
+function render() {
+  // Update current label
+  const sexEmoji = state.sex === "male" ? "♂ Male" : "♀ Female";
+  let label;
+  if (state.age === "1-3" || state.age === "4-8") {
+    label = `Child, ${ageLabel(state.age)}`;
+  } else {
+    label = `${sexEmoji}, ${ageLabel(state.age)}`;
+    if (state.extra === "preg") label += " · Pregnancy";
+    if (state.extra === "lact") label += " · Lactation";
+  }
+  document.getElementById("current").innerHTML = `Showing: <strong>${label}</strong>`;
+
+  // Show/hide pregnancy/lactation options
+  const extraLabel = document.getElementById("extra-label");
+  const extraGroup = document.getElementById("extra-group");
+  const eligible = state.sex === "female" && ["14-18","19-30","31-50"].includes(state.age);
+  if (eligible) {
+    extraLabel.style.display = "block";
+    extraGroup.style.display = "flex";
+    extraGroup.innerHTML = `
+      <button class="btn ${state.extra===null?'active':''}" data-extra="none">None</button>
+      <button class="btn ${state.extra==='preg'?'active':''}" data-extra="preg">Pregnancy</button>
+      <button class="btn ${state.extra==='lact'?'active':''}" data-extra="lact">Lactation</button>
+    `;
+    extraGroup.querySelectorAll('.btn').forEach(b => {
+      b.addEventListener('click', () => {
+        const v = b.dataset.extra;
+        state.extra = (v === "none") ? null : v;
+        render();
+      });
+    });
+  } else {
+    extraLabel.style.display = "none";
+    extraGroup.style.display = "none";
+    state.extra = null;
+  }
+
+  // Pregnancy data only available for 19-30 in this dataset
+  let key = getKey();
+  let d = DATA[key];
+  let fallbackNote = "";
+  if (!d && state.extra) {
+    // fall back to F-19-30-preg/lact if 31-50 selected (close approximation)
+    const fallbackKey = `F-19-30-${state.extra}`;
+    d = DATA[fallbackKey];
+    fallbackNote = " (using 19–30 values as reference)";
+  }
+  if (!d) {
+    document.getElementById("tables").innerHTML = "<p style='text-align:center;padding:20px;'>Data not available for this selection.</p>";
+    return;
+  }
+  if (fallbackNote) {
+    document.getElementById("current").innerHTML += `<br><span style="font-size:11px;color:#888;">${fallbackNote}</span>`;
+  }
+
+  // Build tables
+  const container = document.getElementById("tables");
+  container.innerHTML = "";
+  FIELDS.forEach(section => {
+    const sec = document.createElement("div");
+    sec.className = "section";
+    const rows = section.rows.map(r => {
+      const val = d[r.key];
+      const display = val === undefined ? "—" : (r.unit ? `${val} ${r.unit}` : val);
+      return `<tr><td>${r.label}</td><td>${display}</td></tr>`;
+    }).join("");
+    sec.innerHTML = `
+      <div class="section-header ${section.color}">${section.title}</div>
+      <table>${rows}</table>
+    `;
+    container.appendChild(sec);
+  });
+}
+
+// =================== EVENT BINDING ===================
+document.getElementById("sex-group").querySelectorAll(".btn").forEach(b => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll("#sex-group .btn").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    state.sex = b.dataset.sex;
+    state.extra = null;
+    render();
+  });
+});
+
+document.getElementById("age-group").querySelectorAll(".btn").forEach(b => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll("#age-group .btn").forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    state.age = b.dataset.age;
+    state.extra = null;
+    render();
+  });
+});
+
+render();
+</script>
+
+</body>
+</html>
+
